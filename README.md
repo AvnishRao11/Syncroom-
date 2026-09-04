@@ -178,4 +178,4 @@ There is no live deployment URL yet.
 
 ## Scope Limits
 
-Authentication, chat, host transfer, Redis scaling, multi-server room state, and continuous per-second playback persistence are outside the current MVP scope.
+Authentication, chat,Redis scaling, multi-server room state, and continuous per-second playback persistence are outside the current MVP scope.
