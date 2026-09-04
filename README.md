@@ -69,7 +69,7 @@ Open the Vite URL shown in the terminal, normally `http://localhost:5173`. The c
 3. Share the generated `?room=ROOMCODE` URL.
 4. Load a valid YouTube URL from the host or moderator controls.
 5. Use play, pause, and seek controls to synchronize viewers.
-6. The host can assign moderator status or remove participants.
+6. The host can assign moderator status, transfer ownership, or remove participants.
 7. Anyone can leave using the Leave room action.
 
 ## Roles and Permissions
@@ -82,6 +82,7 @@ Open the Vite URL shown in the terminal, normally `http://localhost:5173`. The c
 | Change video       | Yes  | Yes       | No          |
 | Assign moderator   | Yes  | No        | No          |
 | Remove participant | Yes  | No        | No          |
+| Transfer host      | Yes  | No        | No          |
 | Leave room         | Yes  | Yes       | Yes         |
 
 Permissions are enforced on the backend. The frontend also hides or disables participant playback controls and blocks interaction with the YouTube timeline for watch-only users.
@@ -102,6 +103,7 @@ Client messages:
 - `change_video`: load a validated YouTube URL or video ID.
 - `assign_role`: host assigns `moderator` or `participant`.
 - `remove_participant`: host removes an active participant.
+- `transfer_host`: host transfers ownership to another active participant.
 
 Server messages:
 

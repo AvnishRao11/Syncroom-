@@ -90,6 +90,22 @@ export async function attachSocket(socket) {
                     return broadcast(active, 'role_assigned', { participantId: target.id, role: target.role });
                 }
             }
+            if (message.type === 'transfer_host' && session.role === 'host') {
+                const target = [...active.clients.values()].find((client) => client.id === message.participantId);
+                if (!target || target.id === session.id) {
+                    return send(socket, 'error', { message: 'Choose another active participant as the new host.' });
+                }
+                session.role = 'moderator';
+                target.role = 'host';
+                await Room.updateOne({ code: session.code }, {
+                    $set: {
+                        hostId: target.id,
+                        'participants.$[oldHost].role': 'moderator',
+                        'participants.$[newHost].role': 'host',
+                    },
+                }, { arrayFilters: [{ 'oldHost.id': session.id }, { 'newHost.id': target.id }] });
+                return broadcast(active, 'host_transferred', { previousHostId: session.id, hostId: target.id });
+            }
             if (message.type === 'remove_participant' && session.role === 'host') {
                 const target = [...active.clients.values()].find((client) => client.id === message.participantId);
                 if (target) {

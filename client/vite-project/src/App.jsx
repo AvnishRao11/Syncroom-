@@ -142,6 +142,21 @@ function PartyProvider({ children }) {
               ),
             },
         );
+      else if (message.type === "host_transferred")
+        setRoom(
+          (current) =>
+            current && {
+              ...current,
+              hostId: message.hostId,
+              participants: current.participants.map((item) =>
+                item.id === message.hostId
+                  ? { ...item, role: "host" }
+                  : item.id === message.previousHostId
+                    ? { ...item, role: "moderator" }
+                    : item,
+              ),
+            },
+        );
       else if (message.type === "error") {
         setError(message.message);
         setConnection("offline");
@@ -595,6 +610,14 @@ function Room() {
                       <option value="participant">Participant</option>
                       <option value="moderator">Moderator</option>
                     </select>
+                    <button
+                      className="transfer-button"
+                      onClick={() =>
+                        send("transfer_host", { participantId: person.id })
+                      }
+                    >
+                      Make host
+                    </button>
                     <button
                       className="remove-button"
                       onClick={() =>

@@ -62,6 +62,22 @@ test('synchronizes joins and permits playback only for the host', { skip: !proce
         participant.send(JSON.stringify({ type: 'join_room', code: created.code, name: 'Test Viewer' }));
         assert.equal((await participantSync).room.participants.at(-1).name, 'Test Viewer');
         assert.equal((await joined).participant.name, 'Test Viewer');
+        const participantId = (await participantSync).userId;
+
+        const hostTransfer = waitForMessage(host, 'host_transferred');
+        const participantTransfer = waitForMessage(participant, 'host_transferred');
+        host.send(JSON.stringify({ type: 'transfer_host', participantId }));
+        assert.equal((await hostTransfer).hostId, participantId);
+        assert.equal((await participantTransfer).hostId, participantId);
+        assert.equal((await Room.findOne({ code: created.code }).lean()).hostId, participantId);
+
+        const transferBack = waitForMessage(host, 'host_transferred');
+        participant.send(JSON.stringify({ type: 'transfer_host', participantId: created.hostId }));
+        assert.equal((await transferBack).hostId, created.hostId);
+
+        const roleUpdate = waitForMessage(participant, 'role_assigned');
+        host.send(JSON.stringify({ type: 'assign_role', participantId, role: 'participant' }));
+        assert.equal((await roleUpdate).role, 'participant');
 
         const hostPlayback = waitForMessage(participant, 'seek');
         host.send(JSON.stringify({ type: 'seek', currentTime: 42 }));
