@@ -7,7 +7,9 @@ const app=express();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+app.use(cors({
+    origin: 'https://syncroom-gray.vercel.app/',
+}));
 app.use('/api/rooms', roomRoutes);
 
 app.get('/health',(req,res)=>{
