@@ -72,7 +72,8 @@ export async function attachSocket(socket) {
                 const videoId = videoIdFromUrl(message.url || '') || videoIdFromUrl(message.videoId || '');
                 if (!videoId) return send(socket, 'error', { message: 'Enter a valid YouTube URL.' });
                 await Room.updateOne({ code: session.code }, { videoId, isPlaying: false, currentTime: 0 });
-                return broadcast(active, 'change_video', { videoId, currentTime: 0, isPlaying: false });
+                broadcast(active, 'change_video', { videoId, currentTime: 0, isPlaying: false });
+                return send(socket, 'change_video', { videoId, currentTime: 0, isPlaying: false });
             }
             if (['play', 'pause', 'seek'].includes(message.type)) {
                 const currentTime = Math.max(0, Number(message.currentTime) || 0);

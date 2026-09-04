@@ -82,12 +82,19 @@ test('synchronizes joins and permits playback only for the host', { skip: !proce
         const hostPlayback = waitForMessage(participant, 'seek');
         host.send(JSON.stringify({ type: 'seek', currentTime: 42 }));
         assert.equal((await hostPlayback).currentTime, 42);
+        assert.equal((await Room.findOne({ code: created.code }).lean()).currentTime, 42);
+
+        const hostVideoChange = waitForMessage(host, 'change_video');
+        const participantVideoChange = waitForMessage(participant, 'change_video');
+        host.send(JSON.stringify({ type: 'change_video', videoId: 'dQw4w9WgXcQ' }));
+        assert.equal((await hostVideoChange).videoId, 'dQw4w9WgXcQ');
+        assert.equal((await participantVideoChange).videoId, 'dQw4w9WgXcQ');
 
         const participantError = waitForMessage(participant, 'error');
         participant.send(JSON.stringify({ type: 'seek', currentTime: 99 }));
         assert.match((await participantError).message, /watch-only access/i);
         const stored = await Room.findOne({ code: created.code }).lean();
-        assert.equal(stored.currentTime, 42);
+        assert.equal(stored.currentTime, 0);
 
         const left = waitForMessage(host, 'user_left');
         participant.send(JSON.stringify({ type: 'leave_room' }));
