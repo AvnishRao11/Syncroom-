@@ -391,13 +391,15 @@ function YouTubePlayer({ room, playerApiRef, canControl, send }) {
         playerVars: {
           playsinline: 1,
           rel: 0,
+            enablejsapi: 1,
+            origin: window.location.origin,
           controls: playerControlRef.current.canControl ? 1 : 0,
           disablekb: playerControlRef.current.canControl ? 0 : 1,
         },
         events: {
           onReady: () => {
             setReady(true);
-            playerApiRef.current.seekTo(initialTimeRef.current || 0, true);
+            playerApiRef.current?.seekTo?.(initialTimeRef.current || 0, true);
           },
           onStateChange: (event) => {
             if (
@@ -406,7 +408,7 @@ function YouTubePlayer({ room, playerApiRef, canControl, send }) {
               !playerApiRef.current
             )
               return;
-            const currentTime = playerApiRef.current.getCurrentTime();
+            const currentTime = playerApiRef.current.getCurrentTime?.() ?? 0;
             if (event.data === window.YT.PlayerState.PLAYING)
               playerControlRef.current.send("play", { currentTime });
             if (event.data === window.YT.PlayerState.PAUSED)
@@ -432,9 +434,9 @@ function YouTubePlayer({ room, playerApiRef, canControl, send }) {
   useEffect(() => {
     if (!ready || !playerApiRef.current) return;
     applyingRemoteRef.current = true;
-    if (room.isPlaying) playerApiRef.current.playVideo();
-    else playerApiRef.current.pauseVideo();
-    playerApiRef.current.seekTo(room.currentTime || 0, true);
+    if (room.isPlaying) playerApiRef.current.playVideo?.();
+    else playerApiRef.current.pauseVideo?.();
+    playerApiRef.current.seekTo?.(room.currentTime || 0, true);
     previousTimeRef.current = room.currentTime || 0;
     const release = window.setTimeout(() => {
       applyingRemoteRef.current = false;
@@ -448,10 +450,10 @@ function YouTubePlayer({ room, playerApiRef, canControl, send }) {
       if (
         applyingRemoteRef.current ||
         !playerControlRef.current.canControl ||
-        playerApiRef.current.getPlayerState() !== window.YT.PlayerState.PLAYING
+        playerApiRef.current.getPlayerState?.() !== window.YT.PlayerState.PLAYING
       )
         return;
-      const currentTime = playerApiRef.current.getCurrentTime();
+      const currentTime = playerApiRef.current.getCurrentTime?.();
       if (Math.abs(currentTime - previousTimeRef.current) > 2) {
         previousTimeRef.current = currentTime;
         playerControlRef.current.send("seek", { currentTime });
@@ -490,10 +492,9 @@ function Room() {
   const [url, setUrl] = useState("");
   const playerApiRef = useRef(null);
   const control = (type, payload = {}) => {
-    if (type === "play") playerApiRef.current?.playVideo();
-    if (type === "pause") playerApiRef.current?.pauseVideo();
-    if (type === "seek")
-      playerApiRef.current?.seekTo(payload.currentTime, true);
+    if (type === "play") playerApiRef.current?.playVideo?.();
+    if (type === "pause") playerApiRef.current?.pauseVideo?.();
+    if (type === "seek") playerApiRef.current?.seekTo?.(payload.currentTime, true);
     send(type, payload);
   };
   return (
