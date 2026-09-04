@@ -525,6 +525,7 @@ function Room() {
       <div className="room-grid">
         <section className="player-wrap">
           <YouTubePlayer
+            key={room.videoId || "empty-player"}
             room={room}
             playerApiRef={playerApiRef}
             canControl={canControl}
