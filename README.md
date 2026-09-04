@@ -145,6 +145,23 @@ npm run build
 10. Remove B from A and confirm B returns to the removed state.
 11. Close and reopen a browser connection to verify reconnect behavior.
 
+## Vercel Frontend Deployment
+
+Deploy only `client/vite-project` as the Vercel project root.
+
+1. Push the repository to GitHub and import it into Vercel.
+2. Set the Vercel **Root Directory** to `client/vite-project`.
+3. Use the Vite defaults: build command `npm run build`, output directory `dist`, install command `npm install`.
+4. Add this frontend environment variable in Vercel for Production, Preview, and Development:
+
+```env
+VITE_API_URL=https://your-deployed-backend.example.com
+```
+
+Use the backend origin only. Do not append `/ws` or `/api/rooms`; the client adds those paths itself. Because Vercel environment variables are embedded into the browser bundle, never put `MONGODB_URI` or any secret in the frontend project.
+
+The backend must be deployed separately with WebSocket support. Its public HTTPS origin is automatically converted to `wss://` by the client for the `/ws` connection. Update backend CORS settings with the Vercel domain if you later restrict CORS.
+
 ## Deployment Notes
 
 The app can be deployed as two services on Render or Railway:
@@ -152,7 +169,7 @@ The app can be deployed as two services on Render or Railway:
 - Backend service: working directory `server`, start command `npm start`.
 - Frontend service: working directory `client/vite-project`, build command `npm run build`, serve the `dist` directory.
 - Backend environment: `PORT`, `MONGODB_URI`.
-- Frontend environment: `VITE_API_URL` set to the public backend origin.
+- Frontend environment: `VITE_API_URL` set to the public backend origin; see the Vercel instructions above.
 - Configure the frontend host as a static site and ensure the backend allows its origin through CORS.
 - Use a MongoDB Atlas database with network access restricted to the deployment service where possible.
 - Do not commit `server/.env` or expose database credentials.
