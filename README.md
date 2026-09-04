@@ -168,7 +168,7 @@ The app can be deployed as two services on Render or Railway:
 
 - Backend service: working directory `server`, start command `npm start`.
 - Frontend service: working directory `client/vite-project`, build command `npm run build`, serve the `dist` directory.
-- Backend environment: `PORT`, `MONGODB_URI`.
+- Backend environment: `PORT`, `MONGODB_URI`, and `CLIENT_ORIGIN` set to the Vercel origin, for example `https://syncroom-gray.vercel.app` without a trailing slash.
 - Frontend environment: `VITE_API_URL` set to the public backend origin; see the Vercel instructions above.
 - Configure the frontend host as a static site and ensure the backend allows its origin through CORS.
 - Use a MongoDB Atlas database with network access restricted to the deployment service where possible.
