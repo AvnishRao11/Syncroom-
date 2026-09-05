@@ -1,7 +1,9 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import "./App.css";
 
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000").replace(/\/$/, "");
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:3000"
+).replace(/\/$/, "");
 const PartyContext = createContext(null);
 const ThemeContext = createContext(null);
 
@@ -331,29 +333,36 @@ function Landing() {
               joinRoom(code, name);
             }}
           >
-            <input
-              value={name}
-              onChange={(event) => setName(event.target.value.slice(0, 40))}
-              placeholder="YOUR NAME"
-              maxLength="40"
-              aria-label="Your name"
-            />
-            <input
-              value={code}
-              onChange={(event) =>
-                setCode(
-                  event.target.value
-                    .replace(/[^a-z0-9]/gi, "")
-                    .slice(0, 6)
-                    .toUpperCase(),
-                )
-              }
-              placeholder="ROOM CODE"
-              maxLength="6"
-              aria-label="Room code"
-            />
-            <button disabled={code.length !== 6 || !name.trim()}>
-              Enter room
+            <label className="field-group">
+              <span>Your name</span>
+              <input
+                value={name}
+                onChange={(event) => setName(event.target.value.slice(0, 40))}
+                placeholder="e.g. Alex"
+                maxLength="40"
+              />
+            </label>
+            <label className="field-group">
+              <span>Room code</span>
+              <input
+                value={code}
+                onChange={(event) =>
+                  setCode(
+                    event.target.value
+                      .replace(/[^a-z0-9]/gi, "")
+                      .slice(0, 6)
+                      .toUpperCase(),
+                  )
+                }
+                placeholder="6 characters"
+                maxLength="6"
+              />
+            </label>
+            <button
+              className="join-button"
+              disabled={code.length !== 6 || !name.trim()}
+            >
+              Enter room <span>↗</span>
             </button>
           </form>
           {error && <p className="error">{error}</p>}
@@ -391,8 +400,8 @@ function YouTubePlayer({ room, playerApiRef, canControl, send }) {
         playerVars: {
           playsinline: 1,
           rel: 0,
-            enablejsapi: 1,
-            origin: window.location.origin,
+          enablejsapi: 1,
+          origin: window.location.origin,
           controls: playerControlRef.current.canControl ? 1 : 0,
           disablekb: playerControlRef.current.canControl ? 0 : 1,
         },
@@ -450,7 +459,8 @@ function YouTubePlayer({ room, playerApiRef, canControl, send }) {
       if (
         applyingRemoteRef.current ||
         !playerControlRef.current.canControl ||
-        playerApiRef.current.getPlayerState?.() !== window.YT.PlayerState.PLAYING
+        playerApiRef.current.getPlayerState?.() !==
+          window.YT.PlayerState.PLAYING
       )
         return;
       const currentTime = playerApiRef.current.getCurrentTime?.();
@@ -494,7 +504,8 @@ function Room() {
   const control = (type, payload = {}) => {
     if (type === "play") playerApiRef.current?.playVideo?.();
     if (type === "pause") playerApiRef.current?.pauseVideo?.();
-    if (type === "seek") playerApiRef.current?.seekTo?.(payload.currentTime, true);
+    if (type === "seek")
+      playerApiRef.current?.seekTo?.(payload.currentTime, true);
     send(type, payload);
   };
   return (
